@@ -26,15 +26,21 @@ type AuthResponse struct {
 }
 
 // NewClient -
-func NewClient(host, port, database, username, password *string) (*Client, error) {
+func NewClient(protocol, host, port, database, username, password *string) (*Client, error) {
+	// Default protocol is "mongodb"
+	p := "mongodb"
+	if protocol != nil {
+		p = *protocol
+	}
+
 	c := Client{
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
 		// Default MongoDB connection URL
-		HostURL: "mongodb://localhost:27017",
+		HostURL: fmt.Sprintf("%s://localhost:27017", p),
 	}
 
 	if host != nil && port != nil {
-		c.HostURL = fmt.Sprintf("mongodb://%s:%s", *host, *port)
+		c.HostURL = fmt.Sprintf("%s://%s:%s", p, *host, *port)
 	}
 
 	// If username or password not provided, return empty client
